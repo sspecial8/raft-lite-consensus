@@ -7,13 +7,11 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# ---------- Node identity ----------
 node_id = None
 port = None
 peers = []
 
-# ---------- Raft state ----------
-state = "Follower"          # Follower | Candidate | Leader
+state = "Follower"          
 current_term = 0
 voted_for = None
 log = []
@@ -26,12 +24,10 @@ ELECTION_TIMEOUT = (3, 5)
 HEARTBEAT_INTERVAL = 1
 
 
-# ---------- Helpers ----------
 def majority():
     return (len(peers) + 1) // 2 + 1
 
 
-# ---------- Election ----------
 def election_timeout_loop():
     global state, current_term, voted_for, votes_received
 
@@ -96,7 +92,6 @@ def handle_request_vote():
     return jsonify({"term": current_term, "voteGranted": vote_granted})
 
 
-# ---------- Heartbeats ----------
 def heartbeat_loop():
     while state == "Leader":
         for peer in peers:
@@ -132,7 +127,6 @@ def handle_append_entries():
     return jsonify({"success": True})
 
 
-# ---------- Client command ----------
 @app.route("/client_command", methods=["POST"])
 def client_command():
     global log, commit_index
@@ -175,7 +169,6 @@ def replicate_entry():
     return jsonify({"success": True})
 
 
-# ---------- Main ----------
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--id", required=True)
