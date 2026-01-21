@@ -1,0 +1,97 @@
+# Raft Lite — Consensus (Lab 3)
+
+This project implements a **Raft Lite** consensus protocol as part of the Distributed Computing Lab 3.
+The implementation demonstrates leader election, heartbeats, log replication, majority-based commit,
+and failure recovery using multiple nodes communicating over HTTP.
+
+---
+
+## Requirements
+
+* Python 3.10+
+* macOS / Linux / Windows
+
+Python libraries:
+
+* flask
+* requests
+
+---
+
+## Setup
+
+Create and activate a virtual environment:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install flask requests
+```
+
+---
+
+## Running the Cluster (3 Nodes)
+
+Open **three terminals**, activate `venv` in each, and run:
+
+### Node A
+
+```bash
+python node.py --id A --port 8000 --peers 8001,8002
+```
+
+### Node B
+
+```bash
+python node.py --id B --port 8001 --peers 8000,8002
+```
+
+### Node C
+
+```bash
+python node.py --id C --port 8002 --peers 8000,8001
+```
+
+After a few seconds, one node will become the leader and start sending heartbeats.
+
+---
+
+## Client Interaction
+
+A simple client script is provided to submit commands to the leader.
+
+```bash
+python client.py <leader_port> "SET x = 5"
+```
+
+Example:
+
+```bash
+python client.py 8000 "SET x = 5"
+```
+
+The leader appends the command to its log, replicates it to followers, and commits it after majority agreement.
+
+---
+
+## Failure Experiment
+
+1. Identify the leader node.
+2. Stop the leader process using `Ctrl + C`.
+3. Observe that a new leader is elected automatically by the remaining nodes.
+
+This demonstrates fault tolerance and leader recovery.
+
+---
+
+## Files
+
+* `node.py` — Raft Lite node implementation
+* `client.py` — Simple client for submitting commands
+* `README.md` — Project instructions
+
+---
+
+## Notes
+
+This is a **Raft Lite** implementation and does not include log compaction, snapshots, or persistent storage.
